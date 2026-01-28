@@ -10,6 +10,13 @@ const API_BASE = '/api/survey';
 
 // Role Selection
 function selectRole(role) {
+    // Validate role
+    const validRoles = ['supplier', 'production', 'venue', 'planner'];
+    if (!validRoles.includes(role)) {
+        alert('Invalid role selected');
+        return;
+    }
+    
     selectedRole = role;
     document.getElementById('role-selection').classList.add('hidden');
     document.getElementById('respondent-info').classList.remove('hidden');
@@ -21,6 +28,20 @@ async function startSurvey() {
     
     if (!respondentName) {
         alert('Please enter your name');
+        return;
+    }
+    
+    // Basic input sanitization - limit length and remove special characters
+    if (respondentName.length > 100) {
+        alert('Name is too long (maximum 100 characters)');
+        return;
+    }
+    
+    // Remove any HTML tags for basic XSS prevention
+    respondentName = respondentName.replace(/<[^>]*>/g, '');
+    
+    if (!respondentName) {
+        alert('Please enter a valid name');
         return;
     }
     
@@ -63,33 +84,56 @@ function displayQuestion() {
     const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
     document.getElementById('progress').style.width = progress + '%';
     
-    // Build question HTML
-    let optionsHTML = '';
+    // Clear container
+    container.innerHTML = '';
+    
+    // Create question card
+    const questionCard = document.createElement('div');
+    questionCard.className = 'question-card';
+    
+    // Question number
+    const questionNumber = document.createElement('div');
+    questionNumber.className = 'question-number';
+    questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+    questionCard.appendChild(questionNumber);
+    
+    // Question text
+    const questionText = document.createElement('div');
+    questionText.className = 'question-text';
+    questionText.textContent = question.text;
+    questionCard.appendChild(questionText);
+    
+    // Options container
+    const optionsContainer = document.createElement('div');
+    optionsContainer.className = 'options';
+    
     const inputType = question.type === 'single-select' ? 'radio' : 'checkbox';
     
     question.options.forEach(option => {
         const isChecked = responses[question.id] && responses[question.id].includes(option.id);
-        optionsHTML += `
-            <div class="option ${isChecked ? 'selected' : ''}" onclick="selectOption(${question.id}, ${option.id}, '${inputType}')">
-                <input type="${inputType}" 
-                       name="question-${question.id}" 
-                       value="${option.id}" 
-                       id="option-${option.id}"
-                       ${isChecked ? 'checked' : ''}>
-                <label for="option-${option.id}">${option.text}</label>
-            </div>
-        `;
+        
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option' + (isChecked ? ' selected' : '');
+        optionDiv.onclick = () => selectOption(question.id, option.id, inputType);
+        
+        const input = document.createElement('input');
+        input.type = inputType;
+        input.name = `question-${question.id}`;
+        input.value = option.id;
+        input.id = `option-${option.id}`;
+        input.checked = isChecked;
+        
+        const label = document.createElement('label');
+        label.htmlFor = `option-${option.id}`;
+        label.textContent = option.text;
+        
+        optionDiv.appendChild(input);
+        optionDiv.appendChild(label);
+        optionsContainer.appendChild(optionDiv);
     });
     
-    container.innerHTML = `
-        <div class="question-card">
-            <div class="question-number">Question ${currentQuestionIndex + 1} of ${questions.length}</div>
-            <div class="question-text">${question.text}</div>
-            <div class="options">
-                ${optionsHTML}
-            </div>
-        </div>
-    `;
+    questionCard.appendChild(optionsContainer);
+    container.appendChild(questionCard);
     
     // Update navigation buttons
     document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;

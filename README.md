@@ -186,11 +186,11 @@ Scores are calculated and stored internally but are **not displayed** to survey 
 mvn test
 ```
 
-### Build WAR for Deployment
+### Build JAR for Deployment
 ```bash
 mvn clean package
 ```
-The WAR file will be in `target/academic-survey-system-1.0.0.jar`
+The JAR file will be in `target/academic-survey-system-1.0.0.jar`
 
 ## Configuration Options
 
@@ -201,10 +201,20 @@ server.port=9090
 ```
 
 ### Database Configuration
-For production, update database settings:
+For production, update database settings and use environment variables:
 ```properties
+spring.datasource.url=${DB_URL:jdbc:sqlserver://localhost:1433;databaseName=SurveyDB}
+spring.datasource.username=${DB_USERNAME:sa}
+spring.datasource.password=${DB_PASSWORD}
 spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=false
+```
+
+Set environment variables:
+```bash
+export DB_URL="jdbc:sqlserver://your-server:1433;databaseName=SurveyDB"
+export DB_USERNAME="your_username"
+export DB_PASSWORD="your_secure_password"
 ```
 
 ## Troubleshooting
