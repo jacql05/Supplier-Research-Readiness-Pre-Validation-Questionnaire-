@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "version": "v1.0",
+    "title": "Industry Diagnostic Questionnaire",
+    "description": "Diagnostic tool for assessing Trust, Rework, and Safety in industry collaborations."
+  },
+  "roles": [
+    { "id": "supplier", "label": "Supplier" },
+    { "id": "production", "label": "Production" },
+    { "id": "venue", "label": "Venue" },
+    { "id": "planner", "label": "Planner" }
+  ],
+  "likert_maps": {
+    "freq5": [
+      { "value": 1, "label": "Never", "score": 0 },
+      { "value": 2, "label": "Rarely", "score": 25 },
+      { "value": 3, "label": "Sometimes", "score": 50 },
+      { "value": 4, "label": "Often", "score": 75 },
+      { "value": 5, "label": "Almost always", "score": 100 }
+    ],
+    "agree5": [
+      { "value": 1, "label": "Strongly disagree", "score": 0 },
+      { "value": 2, "label": "Disagree", "score": 25 },
+      { "value": 3, "label": "Neutral", "score": 50 },
+      { "value": 4, "label": "Agree", "score": 75 },
+      { "value": 5, "label": "Strongly agree", "score": 100 }
+    ],
+    "conf5": [
+      { "value": 1, "label": "1 (Low)", "score": 0 },
+      { "value": 2, "label": "2", "score": 25 },
+      { "value": 3, "label": "3", "score": 50 },
+      { "value": 4, "label": "4", "score": 75 },
+      { "value": 5, "label": "5 (High)", "score": 100 }
+    ]
+  },
+  "items_by_role": {
+    "supplier": [
+      { "id": "A1", "text": "How often are your equipment specs questioned or re-verified by others?", "dimension": "Trust", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A2", "text": "How often do clients request clarification after initial data delivery?", "dimension": "Trust", "weight": 0.8, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A3", "text": "How often do you need to provide the same data in multiple formats?", "dimension": "Trust", "weight": 0.7, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A4", "text": "How frequently are dimensions or load ratings disputed?", "dimension": "Trust", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A5", "text": "Do you trust 3D/CAD files received from other suppliers without re-checking?", "dimension": "Trust", "weight": 1.0, "type": "likert", "scale": "agree5", "reverse": true },
+      { "id": "A6", "text": "How often does incorrect interpretation of your data cause rework?", "dimension": "Rework", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A7", "text": "How much staff time is spent correcting or re-explaining specs per project?", "dimension": "Rework", "weight": 0.8, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A8", "text": "How often do data issues delay project timelines?", "dimension": "Rework", "weight": 0.7, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A9", "text": "Have data inconsistencies led to last-minute changes on-site?", "dimension": "Rework", "weight": 0.6, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A10", "text": "Have data disputes increased contractual or liability risk?", "dimension": "Safety", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A11", "text": "Have insurers or auditors queried the reliability of provided data?", "dimension": "Safety", "weight": 0.8, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "A12", "text": "How confident are you that current data practices meet safety expectations?", "dimension": "Safety", "weight": 0.7, "type": "likert", "scale": "conf5", "reverse": true },
+      { "id": "A13", "text": "Is there any industry-wide standard you rely on today?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "A14", "text": "Does lack of a trusted baseline increase your operational risk?", "dimension": "Safety", "weight": 0.9, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "A15", "text": "Would a certified non-commercial data baseline reduce disputes?", "dimension": "Trust", "weight": 0.8, "type": "likert", "scale": "agree5", "reverse": false }
+    ],
+    "production": [
+      { "id": "B1", "text": "How many suppliers’ datasets are combined in a typical project?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B2", "text": "How often are supplier datasets incompatible without adjustment?", "dimension": "Trust", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B3", "text": "How often do you re-measure or re-model supplied equipment?", "dimension": "Trust", "weight": 0.9, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B4", "text": "How frequently do data inconsistencies cause replanning?", "dimension": "Rework", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B5", "text": "How often are planning timelines extended due to data issues?", "dimension": "Rework", "weight": 0.9, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B6", "text": "How often do late data changes trigger revision loops?", "dimension": "Rework", "weight": 0.8, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B7", "text": "How much redundant labour results from inconsistent data?", "dimension": "Rework", "weight": 0.7, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B8", "text": "Have data issues ever affected safety sign-off?", "dimension": "Safety", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B9", "text": "How confident are you in third-party 3D assets?", "dimension": "Trust", "weight": 0.9, "type": "likert", "scale": "conf5", "reverse": true },
+      { "id": "B10", "text": "Do data inconsistencies limit automation or optimisation?", "dimension": "Trust", "weight": 0.8, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "B11", "text": "Are interoperability issues systemic across projects?", "dimension": "Trust", "weight": 0.7, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "B12", "text": "Have insurers raised concerns linked to planning data?", "dimension": "Safety", "weight": 0.8, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "B13", "text": "How confident are you that current workflows scale reliably?", "dimension": "Trust", "weight": 0.7, "type": "likert", "scale": "conf5", "reverse": true },
+      { "id": "B14", "text": "Does lack of a baseline increase project risk exposure?", "dimension": "Safety", "weight": 0.9, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "B15", "text": "Do you view this primarily as an infrastructure failure?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false }
+    ],
+    "venue": [
+      { "id": "C1", "text": "How often do supplier specs differ from on-site reality?", "dimension": "Trust", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "C2", "text": "How often do you independently verify dimensions or loads?", "dimension": "Trust", "weight": 0.9, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "C3", "text": "How confident are you in external 3D models?", "dimension": "Trust", "weight": 0.9, "type": "likert", "scale": "conf5", "reverse": true },
+      { "id": "C4", "text": "How frequently do data mismatches require layout changes?", "dimension": "Rework", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "C5", "text": "How often do approvals get delayed due to data uncertainty?", "dimension": "Rework", "weight": 0.9, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "C6", "text": "How much staff time is spent rechecking third-party data?", "dimension": "Rework", "weight": 0.7, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "C7", "text": "Have data issues increased on-site safety concerns?", "dimension": "Safety", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "C8", "text": "Have insurers or regulators questioned data reliability?", "dimension": "Safety", "weight": 0.9, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "C9", "text": "How confident are you in current compliance documentation?", "dimension": "Safety", "weight": 0.8, "type": "likert", "scale": "conf5", "reverse": true },
+      { "id": "C10", "text": "Does lack of trusted data increase operational risk?", "dimension": "Safety", "weight": 0.9, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "C11", "text": "Do data inconsistencies limit venue utilisation?", "dimension": "Rework", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "C12", "text": "Are these issues recurring across events?", "dimension": "Trust", "weight": 0.7, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "C13", "text": "Is there any shared data standard you rely on?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "C14", "text": "Would a verified baseline improve approval confidence?", "dimension": "Trust", "weight": 0.8, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "C15", "text": "Do you consider this an infrastructure-level problem?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false }
+    ],
+    "planner": [
+      { "id": "D1", "text": "How reliable is early-stage equipment information?", "dimension": "Trust", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": true },
+      { "id": "D2", "text": "How often does initial data later prove inaccurate?", "dimension": "Trust", "weight": 0.9, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "D3", "text": "How many revision cycles are typical per project?", "dimension": "Rework", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "D4", "text": "How often are timelines extended due to data changes?", "dimension": "Rework", "weight": 0.9, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "D5", "text": "How much rework occurs after technical review?", "dimension": "Rework", "weight": 0.8, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "D6", "text": "Do you plan conservatively due to low data trust?", "dimension": "Trust", "weight": 0.7, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "D7", "text": "Does uncertainty limit creative or technical ambition?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "D8", "text": "Have data issues increased client dissatisfaction?", "dimension": "Rework", "weight": 0.7, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "D9", "text": "Have inaccuracies created safety or compliance concerns?", "dimension": "Safety", "weight": 1.0, "type": "likert", "scale": "freq5", "reverse": false },
+      { "id": "D10", "text": "How confident are you in current approval processes?", "dimension": "Safety", "weight": 0.8, "type": "likert", "scale": "conf5", "reverse": true },
+      { "id": "D11", "text": "Do inconsistent specs increase project risk?", "dimension": "Safety", "weight": 0.9, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "D12", "text": "Are delays more often caused by data than people?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "D13", "text": "Are these issues consistent across suppliers?", "dimension": "Trust", "weight": 0.7, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "D14", "text": "Would trusted data reduce stress and revisions?", "dimension": "Trust", "weight": 0.8, "type": "likert", "scale": "agree5", "reverse": false },
+      { "id": "D15", "text": "Do you see this as infrastructure failure?", "dimension": "Trust", "weight": 0.6, "type": "likert", "scale": "agree5", "reverse": false }
+    ]
+  }
+}

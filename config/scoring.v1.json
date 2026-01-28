@@ -1,0 +1,47 @@
+{
+  "meta": "v1.0",
+  "dimensions": {
+    "Trust": { "weight": 0.45 },
+    "Rework": { "weight": 0.35 },
+    "Safety": { "weight": 0.20 }
+  },
+  "ifi_formula": "0.45 * Trust + 0.35 * Rework + 0.20 * Safety",
+  "thresholds": {
+    "Trust": { "low": 40, "high": 70 },
+    "Rework": { "low": 40, "high": 70 },
+    "Safety": { "low": 50, "high": 80 },
+    "IFI": { "low": 50, "high": 75 }
+  },
+  "risk_flags": [
+    {
+      "condition": "Trust < 40",
+      "flag": "CRITICAL_TRUST_DEFICIT",
+      "severity": "High",
+      "message": "Trust levels are critically low, indicating potential relationship breakdown."
+    },
+    {
+      "condition": "Rework < 40",
+      "flag": "HIGH_INEFFICIENCY",
+      "severity": "Medium",
+      "message": "High rework scores indicate significant process inefficiencies."
+    },
+    {
+      "condition": "Safety < 50",
+      "flag": "SAFETY_HAZARD",
+      "severity": "High",
+      "message": "Safety scores suggest immediate attention to protocols is required."
+    },
+    {
+      "condition": "IFI < 50",
+      "flag": "LOW_IFI",
+      "severity": "High",
+      "message": "Overall Industry Friction Index indicates a high-friction environment."
+    }
+  ],
+  "next_actions": {
+    "CRITICAL_TRUST_DEFICIT": "Initiate conflict resolution workshop and review contractual obligations.",
+    "HIGH_INEFFICIENCY": "Conduct process audit and clarify specification documents.",
+    "SAFETY_HAZARD": "Immediate safety stand-down and audit of all protocols.",
+    "LOW_IFI": "Comprehensive review of project management and partner relationships."
+  }
+}
