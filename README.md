@@ -5,7 +5,7 @@ A research-grade, static, and secure industry diagnostic tool designed for non-c
 ## Project Structure
 
 ```
-/
+/ (Root Directory)
 ├── public/
 │   ├── external.html      # Participant Interface (No scoring, strict compliance)
 │   ├── internal.html      # Researcher Console (Scoring, IFI, Risk Analysis)
@@ -17,49 +17,51 @@ A research-grade, static, and secure industry diagnostic tool designed for non-c
 
 ## How to Use
 
-### 1. For Participants (Industry)
+### 1. For Participants (Online Mode)
 **Goal:** Complete the questionnaire and submit raw data.
 
-1.  **Access the Form:** Open the official research link (provided by email).
-    *   *Example:* `https://jacql05.github.io/Supplier-Research-Readiness-Pre-Validation-Questionnaire-/public/external.html`
+**Do NOT run any code.** Simply access the live link:
+
+1.  **Access:** Open the official research link (provided by email).
+    *   *GitHub Pages URL:* `https://<your-username>.github.io/<repo-name>/public/external.html`
+    *   *(e.g., https://jacql05.github.io/Supplier-Research-Readiness-Pre-Validation-Questionnaire-/public/external.html)*
 2.  **Complete:** Select your role and answer the 15 questions.
-3.  **Submit:** Click "Complete & Download".
-    *   This generates a `response_*.json` file on your device.
-    *   **Note:** No data is stored on any server.
-4.  **Send:** Email the downloaded file to: `eghire.contact@gmail.com`.
+3.  **Submit:** Click "Complete & Download" to get your `response_*.json` file.
+4.  **Send:** Email the file to: `eghire.contact@gmail.com`.
 
-### 2. For Researchers (Internal Analysis)
-**Goal:** Score the response files securely.
+---
 
-**Recommended:** Run the scoring tool locally to ensure data privacy (Score Logic is hidden from the public web).
+### 2. For Researchers (Offline Analysis Mode)
+**Goal:** Score the response files securely without uploading data to any external server.
 
-1.  Open Terminal / Command Prompt in the project folder.
-2.  Start the local server:
+**Local Development (Optional):**
+While you *can* host the internal tool on a private server, running it locally is the most secure method for handling research data.
+
+1.  Open Terminal / Command Prompt.
+2.  Navigate to the **project root directory** (where this README is located):
+    ```bash
+    cd <path-to-repo-root>
+    ```
+    *(Do NOT look for an `industry-diagnostic` folder; it has been moved to root.)*
+3.  Start the local server:
     ```bash
     python -m http.server 8080
     ```
-3.  Open the **Internal Console**: [http://localhost:8080/public/internal.html](http://localhost:8080/public/internal.html)
-4.  **Analyze:**
-    *   Upload the participant’s `response_*.json` file.
-    *   View calculated **Trust**, **Rework**, **Safety** scores and **IFI Index**.
-    *   Check **Risk Flags** and **Next Actions**.
-    *   Download the full "Scored JSON" for your records.
+4.  Open the **Internal Console**: [http://localhost:8080/public/internal.html](http://localhost:8080/public/internal.html)
+5.  **Analyze:** Upload the participant’s JSON file to generate scores (Trust/Rework/Safety) and Risk Flags.
 
-## Deployment Guide
+---
 
-### Option A: GitHub Pages (Free & Fast)
-1.  Push this code to your GitHub repository.
+## Deployment Guide (GitHub Pages)
+
+To make the **External Interface** accessible to participants:
+
+1.  Push this code to your GitHub repository (main branch).
 2.  Go to **Settings** -> **Pages**.
 3.  Under **Source**, select `Deploy from a branch`.
-4.  Select Branch: `main` (or master) / Folder: `/(root)`.
+4.  Select Branch: `main` (or the current working branch) / Folder: `/(root)`.
 5.  Click **Save**.
-6.  Your External URL will be: `https://<username>.github.io/<repo-name>/public/external.html`
-
-### Option B: Custom Domain (Professional)
-To use a domain like `diagnostic.eghire.com`:
-1.  Configure your DNS provider (add CNAME pointing to `<username>.github.io`).
-2.  In GitHub **Settings** -> **Pages** -> **Custom domain**, enter your domain.
-3.  Check **Enforce HTTPS**.
+6.  Wait ~1 minute. Your live site will be at the URL shown in the settings (append `/public/external.html`).
 
 ## Compliance & Ethics (Hard Requirements)
 
