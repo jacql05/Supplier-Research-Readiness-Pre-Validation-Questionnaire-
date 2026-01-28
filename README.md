@@ -5,47 +5,61 @@ A research-grade, static, and secure industry diagnostic tool designed for non-c
 ## Project Structure
 
 ```
-industry-diagnostic/
+/
 ├── public/
 │   ├── external.html      # Participant Interface (No scoring, strict compliance)
 │   ├── internal.html      # Researcher Console (Scoring, IFI, Risk Analysis)
 ├── config/
 │   ├── questionnaire.v1.json # Validated questions, roles, and Likert maps
 │   └── scoring.v1.json       # IFI weights, risk thresholds, and logic
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
-## Setup & Deployment
+## How to Use
 
-### 1. Local Development (Required)
+### 1. For Participants (Industry)
+**Goal:** Complete the questionnaire and submit raw data.
 
-Because this system uses external JSON configuration files (`fetch`), modern browsers will block direct file access (`file:///...`) due to CORS security policies.
+1.  **Access the Form:** Open the official research link (provided by email).
+    *   *Example:* `https://jacql05.github.io/Supplier-Research-Readiness-Pre-Validation-Questionnaire-/public/external.html`
+2.  **Complete:** Select your role and answer the 15 questions.
+3.  **Submit:** Click "Complete & Download".
+    *   This generates a `response_*.json` file on your device.
+    *   **Note:** No data is stored on any server.
+4.  **Send:** Email the downloaded file to: `eghire.contact@gmail.com`.
 
-**You must run a local server:**
+### 2. For Researchers (Internal Analysis)
+**Goal:** Score the response files securely.
 
-1.  Open Terminal / Command Prompt.
-2.  Navigate to the project folder:
-    ```bash
-    cd industry-diagnostic
-    ```
-3.  Start the Python simple server:
+**Recommended:** Run the scoring tool locally to ensure data privacy (Score Logic is hidden from the public web).
+
+1.  Open Terminal / Command Prompt in the project folder.
+2.  Start the local server:
     ```bash
     python -m http.server 8080
     ```
-4.  Access the tools in your browser:
-    *   **External (Participant):** [http://localhost:8080/public/external.html](http://localhost:8080/public/external.html)
-    *   **Internal (Researcher):** [http://localhost:8080/public/internal.html](http://localhost:8080/public/internal.html)
+3.  Open the **Internal Console**: [http://localhost:8080/public/internal.html](http://localhost:8080/public/internal.html)
+4.  **Analyze:**
+    *   Upload the participant’s `response_*.json` file.
+    *   View calculated **Trust**, **Rework**, **Safety** scores and **IFI Index**.
+    *   Check **Risk Flags** and **Next Actions**.
+    *   Download the full "Scored JSON" for your records.
 
-### 2. Workflow
+## Deployment Guide
 
-1.  **Distribute:** Send the `external.html` link to industry participants.
-2.  **Collect:** Participants complete the form. No data is sent to a server. They download a JSON file (e.g., `response_supplier_173822...json`) and email it to the researcher.
-3.  **Analyze:**
-    *   Open `internal.html`.
-    *   Upload the participant's JSON file.
-    *   The system calculates Trust, Rework, Safety scores, and the IFI Index.
-    *   Download the "Scored JSON" for aggregation.
+### Option A: GitHub Pages (Free & Fast)
+1.  Push this code to your GitHub repository.
+2.  Go to **Settings** -> **Pages**.
+3.  Under **Source**, select `Deploy from a branch`.
+4.  Select Branch: `main` (or master) / Folder: `/(root)`.
+5.  Click **Save**.
+6.  Your External URL will be: `https://<username>.github.io/<repo-name>/public/external.html`
+
+### Option B: Custom Domain (Professional)
+To use a domain like `diagnostic.eghire.com`:
+1.  Configure your DNS provider (add CNAME pointing to `<username>.github.io`).
+2.  In GitHub **Settings** -> **Pages** -> **Custom domain**, enter your domain.
+3.  Check **Enforce HTTPS**.
 
 ## Compliance & Ethics (Hard Requirements)
 
@@ -57,18 +71,11 @@ Because this system uses external JSON configuration files (`fetch`), modern bro
 ## Configuration Details
 
 ### Scoring Logic (Internal Only)
-
 *   **Normalization:** All 5-point Likert scales are mapped to 0–100.
 *   **Reverse Coding:** Items marked `reverse: true` are calculated as `100 - Score`.
-*   **Missing Values:** Weights are redistributed within the dimension. Missing items are **not** penalized as zero.
+*   **Missing Values:** Weights are redistributed within the dimension. Missing items are not penalized as zero.
 *   **IFI Formula:** `0.45 * Trust + 0.35 * Rework + 0.20 * Safety`
 
 ### Version Control
 *   Questionnaire Version: `v1.0`
 *   Scoring Version: `v1.0`
-
-## placeholders to Update
-Before final deployment, update the text in `public/external.html`:
-*   `5 years from publication`
-*   `Jacq Lew, Project Lead (College-led applied research initiative)`
-*   `eghire.contact@gmail.com`
