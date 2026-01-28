@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industry Diagnostic Questionnaire (Internal - Scoring)</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; color: #333; }
+        h1, h2, h3 { color: #2c3e50; }
+        .hidden { display: none; }
+        .section { margin-bottom: 20px; padding: 20px; border: 1px solid #eee; border-radius: 5px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #3498db; color: #fff; text-decoration: none; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+        .btn:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; }
+        .btn-success:hover { background: #219150; }
+        textarea { width: 100%; height: 150px; font-family: monospace; margin-top: 10px; }
+        .card { background: #f9f9f9; padding: 15px; border-left: 5px solid #ccc; margin-bottom: 15px; }
+        .card.high-risk { border-left-color: #e74c3c; }
+        .card.medium-risk { border-left-color: #f39c12; }
+        .card.low-risk { border-left-color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .score-value { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Internal Scoring System</h1>
+
+    <div id="loading">Loading configurations...</div>
+
+    <div id="app" class="hidden">
+        
+        <div class="section">
+            <h2>1. Import Response</h2>
+            <p>Upload the JSON file exported from the External interface.</p>
+            <input type="file" id="file-input" accept=".json">
+        </div>
+
+        <div id="results-section" class="hidden">
+            <div class="section">
+                <h2>2. Scoring Analysis</h2>
+                
+                <h3>Dimension Scores</h3>
+                <table id="dimension-table">
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>Score (0-100)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <h3>IFI (Industry Friction Index)</h3>
+                <div id="ifi-score" style="font-size: 24px; font-weight: bold; margin: 10px 0;"></div>
+
+                <h3>Risk Flags & Actions</h3>
+                <div id="flags-container"></div>
+            </div>
+
+            <div class="section">
+                <h2>3. Export Scored Data</h2>
+                <button id="download-btn" class="btn btn-success">Download Scored JSON</button>
+                <button id="copy-btn" class="btn">Copy JSON to Clipboard</button>
+                <textarea id="output-json" readonly></textarea>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let questionnaireConfig = null;
+        let scoringConfig = null;
+        let loadedResponse = null;
+        let scoredData = null;
+
+        const loadingEl = document.getElementById('loading');
+        const appEl = document.getElementById('app');
+        const fileInput = document.getElementById('file-input');
+        const resultsSection = document.getElementById('results-section');
+        const dimensionTableBody = document.querySelector('#dimension-table tbody');
+        const ifiScoreEl = document.getElementById('ifi-score');
+        const flagsContainer = document.getElementById('flags-container');
+        const outputJsonEl = document.getElementById('output-json');
+        const downloadBtn = document.getElementById('download-btn');
+        const copyBtn = document.getElementById('copy-btn');
+
+        // Load configs
+        Promise.all([
+            fetch('../config/questionnaire.v1.json').then(r => r.json()),
+            fetch('../config/scoring.v1.json').then(r => r.json())
+        ]).then(([qConfig, sConfig]) => {
+            questionnaireConfig = qConfig;
+            scoringConfig = sConfig;
+            loadingEl.classList.add('hidden');
+            appEl.classList.remove('hidden');
+            initApp();
+        }).catch(err => {
+            loadingEl.innerHTML = `<span style="color:red">Error loading configs: ${err.message}. Ensure local server is running.</span>`;
+        });
+
+        function initApp() {
+            fileInput.addEventListener('change', handleFileUpload);
+            downloadBtn.addEventListener('click', downloadScoredJSON);
+            copyBtn.addEventListener('click', copyJSON);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    loadedResponse = JSON.parse(e.target.result);
+                    processResponse(loadedResponse);
+                } catch (err) {
+                    alert("Invalid JSON file");
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function processResponse(data) {
+            const role = data.role;
+            const userResponses = data.responses;
+            const items = questionnaireConfig.items_by_role[role];
+
+            if (!items) {
+                alert("Role not found in configuration.");
+                return;
+            }
+
+            // 1. Normalize Scores
+            const itemScores = {};
+            const dimensionTotals = {};
+            const dimensionCounts = {};
+
+            // Initialize accumulators
+            Object.keys(scoringConfig.dimensions).forEach(dim => {
+                dimensionTotals[dim] = 0;
+                dimensionCounts[dim] = 0;
+            });
+
+            items.forEach(item => {
+                if (userResponses.hasOwnProperty(item.id)) {
+                    const rawValue = userResponses[item.id];
+                    // Find score from map
+                    const map = questionnaireConfig.likert_maps[item.scale];
+                    const option = map.find(o => o.value === rawValue);
+                    
+                    if (option) {
+                        let score = option.score;
+                        // Reverse coding
+                        if (item.reverse) {
+                            score = 100 - score;
+                        }
+
+                        itemScores[item.id] = {
+                            raw: rawValue,
+                            score: score,
+                            dimension: item.dimension,
+                            text: item.text
+                        };
+
+                        // Accumulate for dimension (Missing Value Handling: only count if present)
+                        if (dimensionTotals.hasOwnProperty(item.dimension)) {
+                            dimensionTotals[item.dimension] += score;
+                            dimensionCounts[item.dimension] += 1;
+                        }
+                    }
+                }
+            });
+
+            // 2. Calculate Dimension Scores (Average)
+            const dimensionScores = {};
+            Object.keys(dimensionTotals).forEach(dim => {
+                if (dimensionCounts[dim] > 0) {
+                    dimensionScores[dim] = parseFloat((dimensionTotals[dim] / dimensionCounts[dim]).toFixed(2));
+                } else {
+                    dimensionScores[dim] = null; // No data for this dimension
+                }
+            });
+
+            // 3. Calculate IFI
+            let ifi = 0;
+            let totalWeight = 0;
+            
+            Object.keys(scoringConfig.dimensions).forEach(dim => {
+                if (dimensionScores[dim] !== null) {
+                    const weight = scoringConfig.dimensions[dim].weight;
+                    ifi += dimensionScores[dim] * weight;
+                    totalWeight += weight;
+                }
+            });
+            
+            // Normalize IFI if some dimensions are missing (redistribute weights effectively)
+            // Although specs say "redistribute weights within dimension", for IFI calculation if a whole dimension is missing we might need to adjust.
+            // Assuming for now all dimensions are present or we just use the weights provided.
+            // If totalWeight is not 1 (e.g. missing dimension), we should normalize.
+            if (totalWeight > 0) {
+                ifi = parseFloat((ifi / totalWeight).toFixed(2));
+            } else {
+                ifi = null;
+            }
+
+            // 4. Risk Flags & Actions
+            const flags = [];
+            let nextActions = [];
+
+            // Check thresholds from scoringConfig
+            // We need to evaluate conditions like "Trust < 40" or "IFI < 50"
+            // Simple parser for conditions
+            scoringConfig.risk_flags.forEach(rule => {
+                const [metric, operator, value] = rule.condition.split(' ');
+                const threshold = parseFloat(value);
+                let metricValue = null;
+
+                if (metric === 'IFI') metricValue = ifi;
+                else metricValue = dimensionScores[metric];
+
+                if (metricValue !== null) {
+                    let triggered = false;
+                    if (operator === '<' && metricValue < threshold) triggered = true;
+                    if (operator === '<=' && metricValue <= threshold) triggered = true;
+                    if (operator === '>' && metricValue > threshold) triggered = true;
+                    if (operator === '>=' && metricValue >= threshold) triggered = true;
+
+                    if (triggered) {
+                        flags.push(rule);
+                        if (scoringConfig.next_actions[rule.flag]) {
+                            nextActions.push(scoringConfig.next_actions[rule.flag]);
+                        }
+                    }
+                }
+            });
+
+            // Construct Result Object
+            scoredData = {
+                input_meta: data.meta,
+                scoring_meta: {
+                    version: scoringConfig.meta, // undefined in config, but okay
+                    calculated_at: new Date().toISOString()
+                },
+                role: role,
+                item_scores: itemScores,
+                dimension_scores: dimensionScores,
+                ifi_score: ifi,
+                flags: flags,
+                recommended_actions: nextActions
+            };
+
+            displayResults(scoredData);
+        }
+
+        function displayResults(data) {
+            resultsSection.classList.remove('hidden');
+
+            // Dimensions Table
+            dimensionTableBody.innerHTML = '';
+            Object.keys(data.dimensionScores).forEach(dim => {
+                const score = data.dimensionScores[dim];
+                const tr = document.createElement('tr');
+                let status = 'Normal';
+                
+                // Simple color coding based on thresholds if available
+                const thresholds = scoringConfig.thresholds[dim];
+                if (thresholds) {
+                    if (score < thresholds.low) status = 'Low (Risk)';
+                    else if (score > thresholds.high) status = 'High (Good)'; // Assuming high is good for Trust/Safety
+                }
+                
+                tr.innerHTML = `<td>${dim}</td><td class="score-value">${score !== null ? score : 'N/A'}</td><td>${status}</td>`;
+                dimensionTableBody.appendChild(tr);
+            });
+
+            // IFI
+            ifiScoreEl.textContent = data.ifi_score !== null ? data.ifi_score : 'N/A';
+            const ifiThreshold = scoringConfig.thresholds.IFI;
+            if (ifiThreshold && data.ifi_score !== null) {
+                if (data.ifi_score < ifiThreshold.low) ifiScoreEl.style.color = '#e74c3c';
+                else if (data.ifi_score > ifiThreshold.high) ifiScoreEl.style.color = '#27ae60';
+                else ifiScoreEl.style.color = '#f39c12';
+            }
+
+            // Flags
+            flagsContainer.innerHTML = '';
+            if (data.flags.length === 0) {
+                flagsContainer.innerHTML = '<p>No specific risk flags triggered.</p>';
+            } else {
+                data.flags.forEach(flag => {
+                    const div = document.createElement('div');
+                    div.className = `card ${flag.severity === 'High' ? 'high-risk' : 'medium-risk'}`;
+                    
+                    const action = scoringConfig.next_actions[flag.flag] || "No specific action defined.";
+                    
+                    div.innerHTML = `
+                        <strong>${flag.flag} (${flag.severity})</strong>
+                        <p>${flag.message}</p>
+                        <p><em>Recommendation: ${action}</em></p>
+                    `;
+                    flagsContainer.appendChild(div);
+                });
+            }
+
+            // JSON Output
+            outputJsonEl.value = JSON.stringify(data, null, 2);
+        }
+
+        function downloadScoredJSON() {
+            if (!scoredData) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(scoredData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `scored_${scoredData.role}_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function copyJSON() {
+            if (!outputJsonEl.value) return;
+            outputJsonEl.select();
+            document.execCommand('copy'); // Fallback or modern API
+            // navigator.clipboard.writeText(outputJsonEl.value); // Modern way
+            alert("Copied to clipboard!");
+        }
+    </script>
+</body>
+</html>
