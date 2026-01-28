@@ -37,8 +37,13 @@ async function startSurvey() {
         return;
     }
     
-    // Remove any HTML tags for basic XSS prevention
-    respondentName = respondentName.replace(/<[^>]*>/g, '');
+    // Sanitize input - only allow alphanumeric, spaces, and basic punctuation
+    const sanitized = respondentName.replace(/[^a-zA-Z0-9\s\-_.,']/g, '');
+    if (sanitized !== respondentName) {
+        alert('Name contains invalid characters. Only letters, numbers, spaces, and basic punctuation are allowed.');
+        return;
+    }
+    respondentName = sanitized.trim();
     
     if (!respondentName) {
         alert('Please enter a valid name');
