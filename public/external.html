@@ -113,6 +113,9 @@
 
 <script>
 (function() {
+    // Always-visible boot marker (helps diagnose "stuck on loading")
+    console.log("[external] boot", { href: location.href, ts: new Date().toISOString() });
+
     let config = null;
     let selectedRole = null;
     let responses = {};
@@ -137,13 +140,28 @@
         roleTitle: document.getElementById('role-title')
     };
 
+    // Surface unexpected JS errors instead of silently hanging on loading overlay.
+    window.addEventListener('error', (e) => {
+        console.error("[external] window.error", e?.error || e?.message || e);
+        showError("Runtime Error: " + (e?.error?.message || e?.message || String(e)));
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+        console.error("[external] unhandledrejection", e?.reason || e);
+        showError("Promise Rejection: " + (e?.reason?.message || String(e?.reason || e)));
+    });
+
     // Initialization
-    fetch('../config/questionnaire.v1.json')
+    // Use no-store to reduce GitHub Pages/CDN cache mismatch issues.
+    fetch('../config/questionnaire.v1.json', { cache: 'no-store' })
         .then(r => {
             if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
             return r.json();
         })
         .then(data => {
+            console.log("[external] questionnaire loaded", {
+                version: data?.meta?.version,
+                roles: Array.isArray(data?.roles) ? data.roles.length : null
+            });
             config = data;
             validateConfig(config);
             initUI();
