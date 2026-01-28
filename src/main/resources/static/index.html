@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Survey System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Academic Survey System</h1>
+            <p class="subtitle">Supplier Research Readiness Pre-Validation Questionnaire</p>
+        </header>
+
+        <div id="role-selection" class="section">
+            <h2>Select Your Role</h2>
+            <div class="role-buttons">
+                <button class="role-btn" onclick="selectRole('supplier')">Supplier</button>
+                <button class="role-btn" onclick="selectRole('production')">Production</button>
+                <button class="role-btn" onclick="selectRole('venue')">Venue</button>
+                <button class="role-btn" onclick="selectRole('planner')">Planner</button>
+            </div>
+        </div>
+
+        <div id="respondent-info" class="section hidden">
+            <h2>Enter Your Information</h2>
+            <div class="form-group">
+                <label for="respondent-name">Name:</label>
+                <input type="text" id="respondent-name" placeholder="Enter your name">
+            </div>
+            <button class="btn-primary" onclick="startSurvey()">Start Survey</button>
+        </div>
+
+        <div id="survey-section" class="section hidden">
+            <div class="progress-bar">
+                <div id="progress" class="progress"></div>
+            </div>
+            <div id="question-container"></div>
+            <div class="navigation">
+                <button id="prev-btn" class="btn-secondary" onclick="previousQuestion()" disabled>Previous</button>
+                <button id="next-btn" class="btn-primary" onclick="nextQuestion()">Next</button>
+                <button id="submit-btn" class="btn-success hidden" onclick="submitSurvey()">Submit Survey</button>
+            </div>
+        </div>
+
+        <div id="completion-section" class="section hidden">
+            <div class="success-message">
+                <h2>✓ Survey Completed</h2>
+                <p>Thank you for completing the survey!</p>
+                <p>Your responses have been recorded successfully.</p>
+                <button class="btn-primary" onclick="resetSurvey()">Take Another Survey</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/survey.js"></script>
+</body>
+</html>
