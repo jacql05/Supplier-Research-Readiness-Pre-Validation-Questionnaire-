@@ -1,89 +1,74 @@
-# Industry Diagnostic Questionnaire System
+# Industry Diagnostic Questionnaire System (Australia Deployment)
 
-A static, configurable industry diagnostic tool assessing Trust, Rework, and Safety.
+A research-grade, static, and secure industry diagnostic tool designed for non-commercial academic research.
 
 ## Project Structure
 
 ```
 industry-diagnostic/
 ├── public/
-│   ├── external.html      # Participant interface (Questions)
-│   ├── internal.html      # Admin interface (Scoring & Analysis)
-│   ├── js/                # (Reserved for future scripts)
-│   └── css/               # (Reserved for future styles)
+│   ├── external.html      # Participant Interface (No scoring, strict compliance)
+│   ├── internal.html      # Researcher Console (Scoring, IFI, Risk Analysis)
 ├── config/
-│   ├── questionnaire.v1.json # Questions, Roles, Likert mappings
-│   └── scoring.v1.json       # Weights, Thresholds, Risk Flags
-├── README.md              # Documentation
+│   ├── questionnaire.v1.json # Validated questions, roles, and Likert maps
+│   └── scoring.v1.json       # IFI weights, risk thresholds, and logic
+├── README.md
 └── .gitignore
 ```
 
-## Setup & Usage
+## Setup & Deployment
 
-### 1. Local Development Environment (Required)
+### 1. Local Development (Required)
 
-Due to browser security policies (CORS/local file access), you cannot simply open the HTML files directly (e.g., `file:///...`). You must run a local web server.
+Because this system uses external JSON configuration files (`fetch`), modern browsers will block direct file access (`file:///...`) due to CORS security policies.
 
-**Using Python (Recommended):**
+**You must run a local server:**
 
-1. Open your terminal/command prompt.
-2. Navigate to the project root directory:
-   ```bash
-   cd industry-diagnostic
-   ```
-3. Start the server:
-   ```bash
-   python -m http.server 8080
-   ```
-4. Access the interfaces in your browser:
-   - **External (for participants):** [http://localhost:8080/public/external.html](http://localhost:8080/public/external.html)
-   - **Internal (for analysis):** [http://localhost:8080/public/internal.html](http://localhost:8080/public/internal.html)
+1.  Open Terminal / Command Prompt.
+2.  Navigate to the project folder:
+    ```bash
+    cd industry-diagnostic
+    ```
+3.  Start the Python simple server:
+    ```bash
+    python -m http.server 8080
+    ```
+4.  Access the tools in your browser:
+    *   **External (Participant):** [http://localhost:8080/public/external.html](http://localhost:8080/public/external.html)
+    *   **Internal (Researcher):** [http://localhost:8080/public/internal.html](http://localhost:8080/public/internal.html)
 
 ### 2. Workflow
 
-**External (Data Collection):**
-1. Send the `external.html` link (or host it) to participants.
-2. Participants select their role (Supplier, Production, Venue, Planner, Other).
-3. Participants answer 15 questions.
-4. On completion, they download a JSON file (e.g., `response_supplier_123456.json`).
-5. They send this JSON file to the administrator.
+1.  **Distribute:** Send the `external.html` link to industry participants.
+2.  **Collect:** Participants complete the form. No data is sent to a server. They download a JSON file (e.g., `response_supplier_173822...json`) and email it to the researcher.
+3.  **Analyze:**
+    *   Open `internal.html`.
+    *   Upload the participant's JSON file.
+    *   The system calculates Trust, Rework, Safety scores, and the IFI Index.
+    *   Download the "Scored JSON" for aggregation.
 
-**Internal (Data Analysis):**
-1. Administrator opens `internal.html`.
-2. Uploads the JSON file received from the participant.
-3. The system automatically:
-   - Normalizes scores (0-100).
-   - Handles reverse-coded items.
-   - Calculates dimension scores (Trust, Rework, Safety).
-   - Calculates the Industry Friction Index (IFI).
-   - Identifies Risk Flags.
-   - Suggests Next Actions.
-4. Administrator can view results on screen or download the full Scored JSON.
+## Compliance & Ethics (Hard Requirements)
 
-## Configuration
+*   **Voluntary:** Participants can withdraw at any time.
+*   **Data Minimisation:** No personal identifiers (names, emails) are required.
+*   **Non-Commercial:** Data is strictly for academic research, not for sales or ranking.
+*   **Separation of Concerns:** The external tool contains **zero** scoring logic to prevent bias or gaming.
 
-### Questionnaire (`config/questionnaire.v1.json`)
-- **Roles:** Define user roles.
-- **Likert Maps:** Define scale values (e.g., 1-5 maps to 0-100).
-- **Items:** Define questions per role.
-  - `reverse: true` indicates the score should be inverted (100 - score).
+## Configuration Details
 
-### Scoring (`config/scoring.v1.json`)
-- **Dimensions:** Weights for Trust (0.45), Rework (0.35), Safety (0.20).
-- **Thresholds:** Low/High cutoffs for risk levels.
-- **Risk Flags:** Logic rules (e.g., `Trust < 40`) and associated messages.
+### Scoring Logic (Internal Only)
 
-## Changelog
+*   **Normalization:** All 5-point Likert scales are mapped to 0–100.
+*   **Reverse Coding:** Items marked `reverse: true` are calculated as `100 - Score`.
+*   **Missing Values:** Weights are redistributed within the dimension. Missing items are **not** penalized as zero.
+*   **IFI Formula:** `0.45 * Trust + 0.35 * Rework + 0.20 * Safety`
 
-### v1.0 (2026-01-28)
-- Initial release.
-- Implemented External and Internal interfaces.
-- Configurable JSON structure for Questions and Scoring.
-- Added IFI calculation and Risk Flag logic.
-- Included "Other" role and generic questions.
-- Implemented missing value handling (re-weighting within dimension).
+### Version Control
+*   Questionnaire Version: `v1.0`
+*   Scoring Version: `v1.0`
 
-## Compliance & Ethics
-- **Anonymity:** No personal identifiers collected.
-- **Data Minimisation:** No pricing or competitive data requested.
-- **Withdrawal:** Participants can withdraw before submission.
+## placeholders to Update
+Before final deployment, update the text in `public/external.html`:
+*   `[INSERT RETENTION PERIOD]`
+*   `[INSERT RESEARCH LEAD NAME]`
+*   `[INSERT CONTACT EMAIL]`

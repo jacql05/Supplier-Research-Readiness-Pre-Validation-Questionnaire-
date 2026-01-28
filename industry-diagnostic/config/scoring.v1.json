@@ -1,4 +1,5 @@
 {
+  "meta": "v1.0",
   "dimensions": {
     "Trust": { "weight": 0.45 },
     "Rework": { "weight": 0.35 },

@@ -3,241 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Industry Diagnostic Questionnaire (External)</title>
+    <title>Industry Diagnostic Questionnaire</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
-        h1, h2 { color: #2c3e50; }
-        .hidden { display: none; }
-        .section { margin-bottom: 20px; padding: 20px; border: 1px solid #eee; border-radius: 5px; }
-        .btn { display: inline-block; padding: 10px 20px; background: #3498db; color: #fff; text-decoration: none; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; background-color: #f8f9fa; }
+        .container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h1 { color: #2c3e50; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        .section { margin-bottom: 30px; }
+        .btn { display: inline-block; padding: 12px 24px; background: #2c3e50; color: #fff; text-decoration: none; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+        .btn:hover { background: #1a252f; }
         .btn:disabled { background: #ccc; cursor: not-allowed; }
-        .question-item { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px; }
-        .likert-options { display: flex; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; }
-        .likert-option { display: flex; flex-direction: column; align-items: center; width: 18%; text-align: center; }
-        .likert-option input { margin-bottom: 5px; }
-        .error { color: red; font-weight: bold; }
-        #loading { text-align: center; font-style: italic; }
+        .hidden { display: none; }
+        .compliance-box { background: #fcfcfc; border: 1px solid #e0e0e0; padding: 20px; margin-bottom: 25px; border-radius: 4px; font-size: 0.95em; }
+        .compliance-box h3 { margin-top: 0; color: #2c3e50; font-size: 1.1em; }
+        .compliance-box ul { padding-left: 20px; }
+        .compliance-box li { margin-bottom: 10px; }
+        .question-item { margin-bottom: 25px; padding: 20px; background: #fff; border: 1px solid #eee; border-radius: 4px; }
+        .question-text { font-weight: 600; margin-bottom: 15px; display: block; }
+        .likert-options { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+        .likert-option { flex: 1; min-width: 100px; text-align: center; cursor: pointer; padding: 10px; border: 1px solid #eee; border-radius: 4px; transition: all 0.2s; }
+        .likert-option:hover { background-color: #f5f5f5; }
+        .likert-option input { margin-bottom: 8px; display: block; margin: 0 auto 5px; }
+        .likert-option.selected { background-color: #e8f4fd; border-color: #3498db; }
+        select { padding: 10px; width: 100%; max-width: 300px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; margin-bottom: 20px; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .error-banner { background: #fee; border: 1px solid #fcc; color: #c00; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.85em; color: #666; }
+        footer p { margin: 5px 0; }
     </style>
 </head>
 <body>
 
-    <div id="loading">Loading configuration...</div>
+<div id="loading-overlay">
+    <h2>Loading Diagnostic Tool...</h2>
+    <div id="error-message" class="error-banner hidden"></div>
+</div>
 
-    <div id="app" class="hidden">
-        <!-- Step 1: Consent & Role Selection -->
-        <div id="intro-section">
-            <h1>Industry Diagnostic Questionnaire</h1>
+<div class="container hidden" id="app-container">
+    
+    <!-- Step 1: Landing & Ethics -->
+    <div id="step-landing">
+        <h1>Industry Diagnostic Questionnaire</h1>
+        
+        <div class="compliance-box">
+            <h3>Ethics & Consent (Strictly Confidential)</h3>
+            <ul>
+                <li><strong>Participation is voluntary.</strong> You may skip any question. You may withdraw at any time before submission.</li>
+                <li><strong>No personal data is required.</strong> Please do not include names, phone numbers, client details, or confidential identifiers.</li>
+                <li><strong>No Commercial Use.</strong> Responses will not be used for sales, supplier ranking, marketing, or any commercial decisioning.</li>
+                <li><strong>Anonymity Options.</strong> You may respond anonymously. If you provide contact details, they will be used only for research follow-up and will not be shared.</li>
+                <li><strong>Data Retention.</strong> Data will be stored securely and accessed only by authorised research personnel. Retention period: [INSERT RETENTION PERIOD].</li>
+            </ul>
             
-            <div class="section">
-                <h2>Purpose & Context</h2>
-                <p>This questionnaire is designed to assess the health of industry collaborations, focusing on Trust, Rework, and Safety.</p>
-                
-                <h3>Ethics & Consent</h3>
-                <ul>
-                    <li><strong>Anonymity:</strong> Your responses are anonymous. No personal identifiers are collected.</li>
-                    <li><strong>Data Minimisation:</strong> Please DO NOT share sensitive personal data, pricing information, or competitive intelligence.</li>
-                    <li><strong>Voluntary Participation:</strong> You may withdraw at any time before submitting your responses by simply closing this page.</li>
-                </ul>
-
-                <div style="margin-top: 20px; padding: 15px; background-color: #e8f6f3; border: 1px solid #a2d9ce;">
-                    <label>
-                        <input type="checkbox" id="consent-checkbox">
-                        I have read and understood the above. I agree to participate and confirm I will not disclose restricted information.
-                    </label>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>Select Your Role</h2>
-                <p>Please select the role that best describes your position in the project/organization:</p>
-                <select id="role-select" style="padding: 8px; font-size: 16px; width: 100%; max-width: 300px;">
-                    <option value="">-- Select Role --</option>
-                    <!-- Roles will be populated here -->
-                </select>
-            </div>
-
-            <button id="start-btn" class="btn" disabled>Start Questionnaire</button>
-        </div>
-
-        <!-- Step 2: Questionnaire -->
-        <div id="questionnaire-section" class="hidden">
-            <h2 id="role-title">Questionnaire</h2>
-            <p>Please answer the following questions based on your experience.</p>
-            <div id="questions-container">
-                <!-- Questions will be rendered here -->
-            </div>
-            
-            <div style="margin-top: 30px;">
-                <button id="submit-btn" class="btn">Submit Responses</button>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ddd;">
+                <label style="display: flex; align-items: start; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="consent-check" style="margin-top: 5px;">
+                    <span>I have read the above and consent to participate in this industry research diagnostic.</span>
+                </label>
             </div>
         </div>
 
-        <!-- Step 3: Completion -->
-        <div id="completion-section" class="hidden">
-            <h2>Thank You!</h2>
-            <p>Your responses have been recorded locally.</p>
-            <p>Please download the JSON file below and send it to the administrator.</p>
+        <div class="section">
+            <label for="role-select" style="display: block; margin-bottom: 10px; font-weight: bold;">Select your primary role:</label>
+            <select id="role-select" disabled>
+                <option value="">-- Choose Role --</option>
+            </select>
+        </div>
+
+        <button id="btn-start" class="btn" disabled>Start Diagnostic</button>
+    </div>
+
+    <!-- Step 2: Questions -->
+    <div id="step-questions" class="hidden">
+        <h2 id="role-title">Questionnaire</h2>
+        <div id="questions-container"></div>
+        
+        <div style="margin-top: 30px; display: flex; gap: 15px;">
+            <button id="btn-submit" class="btn">Complete & Download Responses</button>
+            <button id="btn-withdraw" class="btn" style="background: #e74c3c;">Withdraw</button>
+        </div>
+    </div>
+
+    <!-- Step 3: Completion -->
+    <div id="step-complete" class="hidden">
+        <div style="text-align: center; padding: 40px 0;">
+            <h2 style="color: #27ae60;">Thank You</h2>
+            <p>Your responses have been generated successfully.</p>
+            <p style="margin: 20px 0;">Please save the JSON file below and email it to the research administrator.</p>
             
-            <button id="download-btn" class="btn" style="background-color: #27ae60;">Download JSON Response</button>
+            <a id="download-link" class="btn" style="background: #27ae60;">Download Response JSON</a>
             
-            <p style="margin-top: 20px; font-size: 0.9em; color: #666;">
-                Note: No data has been sent to any server. You are in full control of your data file.
+            <p style="margin-top: 30px; font-size: 0.9em; color: #7f8c8d;">
+                This file contains only your role selection and anonymous item responses.<br>
+                No data has been sent to any server.
             </p>
         </div>
     </div>
 
-    <script>
-        let config = null;
-        let selectedRole = null;
-        let responses = {};
-        const timestamp = new Date().toISOString();
+    <footer>
+        <p><strong>Research Lead / Governance Entity:</strong> [INSERT NAME]</p>
+        <p><strong>Contact Email:</strong> [INSERT EMAIL]</p>
+        <p>This tool is for non-commercial industry diagnostic research only.</p>
+        <p>Participation is voluntary. Data is stored securely.</p>
+        <p>Data minimization: No personal identifiers collected.</p>
+        <p>Retention period: [INSERT RETENTION PERIOD].</p>
+    </footer>
+</div>
 
-        // Elements
-        const loadingEl = document.getElementById('loading');
-        const appEl = document.getElementById('app');
-        const introSection = document.getElementById('intro-section');
-        const questionnaireSection = document.getElementById('questionnaire-section');
-        const completionSection = document.getElementById('completion-section');
-        const consentCheckbox = document.getElementById('consent-checkbox');
-        const roleSelect = document.getElementById('role-select');
-        const startBtn = document.getElementById('start-btn');
-        const questionsContainer = document.getElementById('questions-container');
-        const submitBtn = document.getElementById('submit-btn');
-        const downloadBtn = document.getElementById('download-btn');
+<script>
+(function() {
+    let config = null;
+    let selectedRole = null;
+    let responses = {};
+    const appState = {
+        meta: null
+    };
 
-        // Fetch Configuration
-        fetch('../config/questionnaire.v1.json')
-            .then(response => {
-                if (!response.ok) throw new Error("Failed to load configuration");
-                return response.json();
-            })
-            .then(data => {
-                config = data;
-                initApp();
-            })
-            .catch(err => {
-                loadingEl.innerHTML = `<span class="error">Error: ${err.message}. Ensure you are running a local server (e.g., python -m http.server).</span>`;
-            });
+    const els = {
+        loading: document.getElementById('loading-overlay'),
+        error: document.getElementById('error-message'),
+        app: document.getElementById('app-container'),
+        landing: document.getElementById('step-landing'),
+        questions: document.getElementById('step-questions'),
+        complete: document.getElementById('step-complete'),
+        roleSelect: document.getElementById('role-select'),
+        consentCheck: document.getElementById('consent-check'),
+        btnStart: document.getElementById('btn-start'),
+        questionsContainer: document.getElementById('questions-container'),
+        btnSubmit: document.getElementById('btn-submit'),
+        btnWithdraw: document.getElementById('btn-withdraw'),
+        downloadLink: document.getElementById('download-link'),
+        roleTitle: document.getElementById('role-title')
+    };
 
-        function initApp() {
-            loadingEl.classList.add('hidden');
-            appEl.classList.remove('hidden');
+    // Initialization
+    fetch('../config/questionnaire.v1.json')
+        .then(r => {
+            if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+            return r.json();
+        })
+        .then(data => {
+            config = data;
+            validateConfig(config);
+            initUI();
+        })
+        .catch(err => {
+            showError("Configuration Error: Failed to load questionnaire data. Ensure you are running via a local server (python -m http.server). " + err.message);
+        });
 
-            // Populate roles
-            config.roles.forEach(role => {
-                const option = document.createElement('option');
-                option.value = role.id;
-                option.textContent = role.label;
-                roleSelect.appendChild(option);
-            });
+    function validateConfig(cfg) {
+        if (cfg.meta.version !== "v1.0") console.warn("Version mismatch warning");
+        if (!cfg.roles || cfg.roles.length === 0) throw new Error("No roles defined in config");
+        // Strict academic validation could go here
+    }
 
-            // Listeners
-            consentCheckbox.addEventListener('change', checkStartEnabled);
-            roleSelect.addEventListener('change', checkStartEnabled);
-            startBtn.addEventListener('click', startQuestionnaire);
-            submitBtn.addEventListener('click', submitResponses);
-            downloadBtn.addEventListener('click', downloadJSON);
+    function showError(msg) {
+        els.error.textContent = msg;
+        els.error.classList.remove('hidden');
+    }
+
+    function initUI() {
+        els.loading.classList.add('hidden');
+        els.app.classList.remove('hidden');
+
+        // Populate Roles
+        config.roles.forEach(role => {
+            const opt = document.createElement('option');
+            opt.value = role.id;
+            opt.textContent = role.label;
+            els.roleSelect.appendChild(opt);
+        });
+
+        // Event Listeners
+        els.consentCheck.addEventListener('change', updateStartButton);
+        els.roleSelect.addEventListener('change', updateStartButton);
+        els.btnStart.addEventListener('click', startQuestionnaire);
+        els.btnSubmit.addEventListener('click', finishQuestionnaire);
+        els.btnWithdraw.addEventListener('click', () => window.location.reload());
+    }
+
+    function updateStartButton() {
+        const isConsent = els.consentCheck.checked;
+        const isRole = els.roleSelect.value !== "";
+        els.btnStart.disabled = !(isConsent && isRole);
+        els.roleSelect.disabled = !isConsent;
+    }
+
+    function startQuestionnaire() {
+        selectedRole = els.roleSelect.value;
+        const roleData = config.roles.find(r => r.id === selectedRole);
+        const questions = config.items_by_role[selectedRole];
+
+        if (!questions || questions.length !== 15) {
+            showError(`Configuration Error: Expected 15 questions for role '${selectedRole}', found ${questions ? questions.length : 0}.`);
+            return;
         }
 
-        function checkStartEnabled() {
-            startBtn.disabled = !(consentCheckbox.checked && roleSelect.value);
-        }
+        els.roleTitle.textContent = `${roleData.label} Questionnaire`;
+        renderQuestions(questions);
 
-        function startQuestionnaire() {
-            selectedRole = roleSelect.value;
-            const roleConfig = config.roles.find(r => r.id === selectedRole);
-            const items = config.items_by_role[selectedRole];
+        els.landing.classList.add('hidden');
+        els.questions.classList.remove('hidden');
+        window.scrollTo(0, 0);
+    }
+
+    function renderQuestions(items) {
+        els.questionsContainer.innerHTML = '';
+        items.forEach((item, idx) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-item';
             
-            if (!items) {
-                alert("No questions defined for this role.");
+            const qText = document.createElement('label');
+            qText.className = 'question-text';
+            qText.textContent = `${idx + 1}. ${item.text}`;
+            qDiv.appendChild(qText);
+
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'likert-options';
+
+            const scaleMap = config.likert_maps[item.scale];
+            if (!scaleMap) {
+                console.error(`Missing scale map for ${item.scale}`);
                 return;
             }
 
-            document.getElementById('role-title').textContent = `${roleConfig.label} Questionnaire`;
-            renderQuestions(items);
-
-            introSection.classList.add('hidden');
-            questionnaireSection.classList.remove('hidden');
-            window.scrollTo(0, 0);
-        }
-
-        function renderQuestions(items) {
-            questionsContainer.innerHTML = '';
-            items.forEach((item, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'question-item';
+            scaleMap.forEach(opt => {
+                const optLabel = document.createElement('label');
+                optLabel.className = 'likert-option';
                 
-                const label = document.createElement('div');
-                label.innerHTML = `<strong>${index + 1}.</strong> ${item.text}`;
-                itemDiv.appendChild(label);
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = item.id;
+                input.value = opt.value;
+                input.onclick = (e) => {
+                    responses[item.id] = parseInt(e.target.value, 10);
+                    // Visual feedback
+                    optionsContainer.querySelectorAll('.likert-option').forEach(l => l.classList.remove('selected'));
+                    optLabel.classList.add('selected');
+                };
 
-                const scaleMap = config.likert_maps[item.scale];
-                const optionsDiv = document.createElement('div');
-                optionsDiv.className = 'likert-options';
-
-                scaleMap.forEach(opt => {
-                    const optLabel = document.createElement('label');
-                    optLabel.className = 'likert-option';
-                    
-                    const radio = document.createElement('input');
-                    radio.type = 'radio';
-                    radio.name = item.id;
-                    radio.value = opt.value;
-                    radio.addEventListener('change', (e) => {
-                        responses[item.id] = parseInt(e.target.value, 10);
-                    });
-
-                    optLabel.appendChild(radio);
-                    optLabel.appendChild(document.createTextNode(opt.label));
-                    optionsDiv.appendChild(optLabel);
-                });
-
-                itemDiv.appendChild(optionsDiv);
-                questionsContainer.appendChild(itemDiv);
+                optLabel.appendChild(input);
+                optLabel.appendChild(document.createTextNode(opt.label));
+                optionsContainer.appendChild(optLabel);
             });
-        }
 
-        function submitResponses() {
-            const roleItems = config.items_by_role[selectedRole];
-            const answeredCount = Object.keys(responses).length;
-            
-            // Basic validation: warn if not all answered, but allow submission as per "missing value handling" requirements in Internal
-            // The prompt says "Missing value rules: re-distribute weight within dimension (not 0 penalty)".
-            // So we allow submission with missing values.
-            
-            if (answeredCount < roleItems.length) {
-                if (!confirm(`You have answered ${answeredCount} out of ${roleItems.length} questions. Do you want to submit anyway?`)) {
-                    return;
-                }
-            } else {
-                 if (!confirm("Are you sure you want to submit your responses?")) {
-                    return;
-                }
-            }
+            qDiv.appendChild(optionsContainer);
+            els.questionsContainer.appendChild(qDiv);
+        });
+    }
 
-            questionnaireSection.classList.add('hidden');
-            completionSection.classList.remove('hidden');
-            window.scrollTo(0, 0);
-        }
+    function finishQuestionnaire() {
+        // Prepare Export
+        const exportData = {
+            meta: {
+                questionnaire_version: config.meta.version,
+                generated_at: new Date().toISOString()
+            },
+            role: selectedRole,
+            responses: responses,
+            notes: "Research-only data. Not for commercial use."
+        };
 
-        function downloadJSON() {
-            const output = {
-                meta: {
-                    questionnaire_version: config.meta.version,
-                    generated_at: new Date().toISOString()
-                },
-                role: selectedRole,
-                responses: responses
-            };
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
 
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(output, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", `response_${selectedRole}_${Date.now()}.json`);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-    </script>
+        els.downloadLink.href = url;
+        els.downloadLink.download = `response_${selectedRole}_${Date.now()}.json`;
+
+        els.questions.classList.add('hidden');
+        els.complete.classList.remove('hidden');
+        window.scrollTo(0, 0);
+    }
+})();
+</script>
+
 </body>
 </html>
