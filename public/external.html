@@ -50,7 +50,7 @@
 </div>
 
 <div class="container hidden" id="app-container">
-    
+    <div id="app-error" class="error-banner hidden" style="margin-bottom:1em;"></div>
     <!-- Step 1: Landing & Ethics -->
     <div id="step-landing">
         <h1>Industry Diagnostic Questionnaire</h1>
@@ -147,22 +147,36 @@
         btnSubmit: document.getElementById('btn-submit'),
         btnWithdraw: document.getElementById('btn-withdraw'),
         downloadLink: document.getElementById('download-link'),
-        roleTitle: document.getElementById('role-title')
+        roleTitle: document.getElementById('role-title'),
+        appError: document.getElementById('app-error')
     };
+
+    function hideLoadingShowApp() {
+        if (els.loading) els.loading.classList.add('hidden');
+        if (els.app) els.app.classList.remove('hidden');
+    }
+
+    function showErrorAndRevealApp(msg) {
+        showError(msg);
+        if (els.appError) { els.appError.textContent = msg; els.appError.classList.remove('hidden'); }
+        hideLoadingShowApp();
+    }
 
     // Surface unexpected JS errors instead of silently hanging on loading overlay.
     window.addEventListener('error', (e) => {
+        var msg = "Runtime Error: " + (e?.error?.message || e?.message || String(e));
         console.error("[external] window.error", e?.error || e?.message || e);
-        showError("Runtime Error: " + (e?.error?.message || e?.message || String(e)));
+        showErrorAndRevealApp(msg);
     });
     window.addEventListener('unhandledrejection', (e) => {
+        var msg = "Promise Rejection: " + (e?.reason?.message || String(e?.reason || e));
         console.error("[external] unhandledrejection", e?.reason || e);
-        showError("Promise Rejection: " + (e?.reason?.message || String(e?.reason || e)));
+        showErrorAndRevealApp(msg);
     });
 
-    // Initialization
-    // Use no-store to reduce GitHub Pages/CDN cache mismatch issues.
-    fetch('../config/questionnaire.v1.json', { cache: 'no-store' })
+    // Initialization: use absolute URL so path is correct on GitHub Pages (no base/redirect issues).
+    var configUrl = new URL('../config/questionnaire.v1.json', location.href).href;
+    fetch(configUrl, { cache: 'no-store' })
         .then(r => {
             if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
             return r.json();
@@ -177,7 +191,8 @@
             initUI();
         })
         .catch(err => {
-            showError("Configuration Error: Failed to load questionnaire data. Ensure you are running via a local server (python -m http.server). " + err.message);
+            console.error("[external] config fetch/init failed", err);
+            showErrorAndRevealApp("Configuration Error: " + err.message);
         });
 
     function validateConfig(cfg) {
